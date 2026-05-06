@@ -1,62 +1,138 @@
 import 'package:flutter/material.dart';
 
 class LevelOneMathScreen extends StatelessWidget {
-  final List<Map<String, String>> items = [
-    {"title": "الأرقام", "image": "assets/images/5.jpeg"},
-    {"title": "صل الصورة بالرقم الصحيح", "image": "assets/images/6.jpeg"},
+  LevelOneMathScreen({super.key});
+
+  final List<Map<String, dynamic>> items = [
+    {
+      "title": "الأرقام",
+      "image": "assets/images/5.jpeg",
+      "color": Colors.orange,
+    },
+    {
+      "title": "صل الصورة بالرقم الصحيح",
+      "image": "assets/images/6.jpeg",
+      "color": Colors.purple,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: GridView.builder(
-          itemCount: items.length,
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 7 / 8,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF4FC3F7), Color(0xFF81C784)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          itemBuilder: (context, index) {
-            return buildCard(context, items[index]);
-          },
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 30),
+
+              /// ⭐ العنوان داخل بوكس
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 25,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  "المستوى الأول - رياضيات",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              /// 📦 Grid
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: GridView.builder(
+                    itemCount: items.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.85,
+                        ),
+                    itemBuilder: (context, index) {
+                      return buildCard(context, items[index]);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget buildCard(BuildContext context, Map<String, String> item) {
-    return InkWell(
+  Widget buildCard(BuildContext context, Map<String, dynamic> item) {
+    return GestureDetector(
       onTap: () {
-        // هنا تقدر تعمل navigation
+        // navigation هنا
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
+          color: item["color"],
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: const [
             BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 6,
-              offset: Offset(0, 3),
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(item["image"]!, height: 150),
-            SizedBox(height: 10),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Image.asset(item["image"]),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
-                item["title"]!,
+                item["title"],
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: Colors.black,
+                style: const TextStyle(
                   fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
