@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class LettersQuizGame extends StatefulWidget {
   const LettersQuizGame({super.key});
@@ -9,11 +10,13 @@ class LettersQuizGame extends StatefulWidget {
 }
 
 class _LettersQuizGameState extends State<LettersQuizGame> {
+  final AudioPlayer player = AudioPlayer();
+
   final List<Map<String, dynamic>> questions = [
-    {"image": "assets/images/cat.png", "letter": "ق"},
-    {"image": "assets/images/dog.png", "letter": "ك"},
-    {"image": "assets/images/lion.png", "letter": "أ"},
-    {"image": "assets/images/banana.png", "letter": "ب"},
+    {"letter": "ق", "sound": "q.mp3"},
+    {"letter": "ك", "sound": "k.mp3"},
+    {"letter": "أ", "sound": "a.mp3"},
+    {"letter": "ب", "sound": "b.mp3"},
   ];
 
   final List<String> letters = [
@@ -36,17 +39,21 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
   void initState() {
     super.initState();
     generateOptions();
+    playSound(); // 👈 يشغل أول سؤال تلقائي
   }
 
-  String get currentImage => questions[index]["image"];
   String get correctLetter => questions[index]["letter"];
+  String get currentSound => questions[index]["sound"];
 
-  /// ✅ توليد اختيارات صحيحة 100%
+  // 🎧 تشغيل الصوت
+  Future<void> playSound() async {
+    await player.stop();
+    await player.play(AssetSource("sounds/$currentSound"));
+  }
+
   void generateOptions() {
     final rand = Random();
-
-    Set<String> temp = {};
-    temp.add(correctLetter);
+    Set<String> temp = {correctLetter};
 
     while (temp.length < 4) {
       temp.add(letters[rand.nextInt(letters.length)]);
@@ -55,31 +62,31 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
     options = temp.toList()..shuffle();
   }
 
-  void checkAnswer(String value) {
+  void checkAnswer(String value) async {
     setState(() {
       showFeedback = true;
       isCorrect = value == correctLetter;
-
-      if (isCorrect) {
-        score++;
-      }
     });
 
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (!mounted) return;
+    if (isCorrect) score++;
 
-      if (index < questions.length - 1) {
-        setState(() {
-          index++;
-          showFeedback = false;
-          generateOptions();
-        });
-      } else {
-        setState(() {
-          showResult = true;
-        });
-      }
-    });
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    if (!mounted) return;
+
+    if (index < questions.length - 1) {
+      setState(() {
+        index++;
+        showFeedback = false;
+        generateOptions();
+      });
+
+      await playSound(); // 👈 صوت السؤال الجديد
+    } else {
+      setState(() {
+        showResult = true;
+      });
+    }
   }
 
   void restart() {
@@ -90,6 +97,8 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
       showResult = false;
       generateOptions();
     });
+
+    playSound();
   }
 
   @override
@@ -98,7 +107,7 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
       backgroundColor: const Color(0xFF81C784),
 
       appBar: AppBar(
-        title: const Text("حرف وصورة"),
+        title: const Text("اسمع الحرف 🎧"),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -115,37 +124,21 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
 
-        /// 🖼️ الصورة
-        Container(
-          width: 180,
-          height: 180,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Image.asset(
-              currentImage,
-              fit: BoxFit.contain,
-            ),
-          ),
+        const Text(
+          "اسمع الحرف واضغط الإجابة 🎧",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
         ),
 
         const SizedBox(height: 20),
 
-        const Text(
-          "الصورة تبدأ بأي حرف؟",
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        ElevatedButton(
+          onPressed: playSound,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+          child: const Text("🔊 إعادة تشغيل الصوت"),
         ),
 
-        const SizedBox(height: 15),
+        const SizedBox(height: 20),
 
-        /// ⭐ Feedback
         if (showFeedback)
           Icon(
             isCorrect ? Icons.star : Icons.cancel,
@@ -155,7 +148,6 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
 
         const SizedBox(height: 10),
 
-        /// 🔘 الأزرار (مضمونة 4)
         Column(
           children: options.map((letter) {
             return Padding(
@@ -171,10 +163,7 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
-                    letter,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  child: Text(letter, style: const TextStyle(fontSize: 28)),
                 ),
               ),
             );
@@ -188,15 +177,10 @@ class _LettersQuizGameState extends State<LettersQuizGame> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-
         const Icon(Icons.emoji_events, size: 120, color: Colors.amber),
-
         const SizedBox(height: 20),
 
-        const Text(
-          "أحسنت 🎉",
-          style: TextStyle(fontSize: 28, color: Colors.white),
-        ),
+        const Text("أحسنت 🎉", style: TextStyle(fontSize: 28, color: Colors.white)),
 
         const SizedBox(height: 10),
 
