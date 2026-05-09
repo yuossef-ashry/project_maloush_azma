@@ -67,9 +67,7 @@ flutter:
     - assets/sounds/4.mp3
     - assets/sounds/5.mp3
     - assets/sounds/6.mp3
-    - assets/sounds/7.mp3
-    - assets/sounds/8.mp3
-    - assets/sounds/9.mp3
+  
 
   fonts:
     - family: ElMessiri
