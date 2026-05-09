@@ -20,42 +20,18 @@ class _ChooseLetterGameState extends State<ChooseLetterGame> {
     {"word": "دب", "letter": "د"},
     {"word": "ذرة", "letter": "ذ"},
     {"word": "رمان", "letter": "ر"},
-    {"word": "زرافة", "letter": "ز"},
-    {"word": "سمك", "letter": "س"},
-    {"word": "شمس", "letter": "ش"},
-    {"word": "صقر", "letter": "ص"},
-    {"word": "ضفدع", "letter": "ض"},
-    {"word": "طائرة", "letter": "ط"},
-    {"word": "ظرف", "letter": "ظ"},
-    {"word": "عنب", "letter": "ع"},
-    {"word": "غزال", "letter": "غ"},
-    {"word": "فيل", "letter": "ف"},
-    {"word": "قلم", "letter": "ق"},
-    {"word": "كتاب", "letter": "ك"},
-    {"word": "ليمون", "letter": "ل"},
-    {"word": "موز", "letter": "م"},
-    {"word": "نمر", "letter": "ن"},
-    {"word": "هدهد", "letter": "ه"},
-    {"word": "وردة", "letter": "و"},
-    {"word": "يمامة", "letter": "ي"},
   ];
 
   final List<String> letters = [
-    "أ","ب","ت","ث","ج","ح","خ","د",
-    "ذ","ر","ز","س","ش","ص","ض",
-    "ط","ظ","ع","غ","ف","ق","ك",
-    "ل","م","ن","ه","و","ي","ء"
+    "أ","ب","ت","ث","ج","ح","خ","د","ذ","ر","ز","س","ش","ص","ض"
   ];
 
   int index = 0;
   int score = 0;
 
   List<String> options = [];
-
   String? selected;
   bool answered = false;
-
-  bool showWrong = false;
   bool showResult = false;
 
   @override
@@ -64,51 +40,47 @@ class _ChooseLetterGameState extends State<ChooseLetterGame> {
     generateOptions();
   }
 
-  String get currentWord => questions[index]["word"]!;
-  String get correctLetter => questions[index]["letter"]!;
+  String get word => questions[index]["word"]!;
+  String get correct => questions[index]["letter"]!;
 
   void generateOptions() {
-    Set<String> temp = {correctLetter};
     final rand = Random();
+    Set<String> set = {correct};
 
-    while (temp.length < 4) {
-      temp.add(letters[rand.nextInt(letters.length)]);
+    while (set.length < 4) {
+      set.add(letters[rand.nextInt(letters.length)]);
     }
 
-    options = temp.toList()..shuffle();
+    options = set.toList()..shuffle();
   }
 
-  void checkAnswer(String value) {
+  void check(String value) {
     if (answered) return;
 
     setState(() {
       selected = value;
       answered = true;
+
+      if (value == correct) score++;
     });
 
-    bool isCorrect = value == correctLetter;
-
-    if (isCorrect) score++;
-
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (!mounted) return;
 
-      if (index < questions.length - 1) {
-        setState(() {
-          index++;
-          generateOptions();
-          selected = null;
-          answered = false;
-        });
+      if (index == questions.length - 1) {
+        setState(() => showResult = true);
       } else {
         setState(() {
-          showResult = true;
+          index++;
+          selected = null;
+          answered = false;
+          generateOptions();
         });
       }
     });
   }
 
-  void restartGame() {
+  void restart() {
     setState(() {
       index = 0;
       score = 0;
@@ -119,140 +91,188 @@ class _ChooseLetterGameState extends State<ChooseLetterGame> {
     });
   }
 
-  Color getButtonColor(String letter) {
+  // ───────── BACKGROUND ─────────
+  Widget buildBackground({required Widget child}) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF4FC3F7),
+            Color(0xFF81C784),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  Color color(String v) {
     if (!answered) return Colors.orange;
-
-    if (letter == correctLetter) {
-      return Colors.green; // الصح
-    }
-
-    if (letter == selected) {
-      return Colors.red; // الغلط اللي ضغط عليه
-    }
-
-    return Colors.grey.shade400;
+    if (v == correct) return Colors.green;
+    if (v == selected) return Colors.red;
+    return Colors.grey;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF81C784),
-
-      appBar: AppBar(
-        title: const Text("اختبار 28 حرف"),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-
-      body: Center(
-        child: showResult
-            ? buildResult()
-            : buildGame(),
+      body: buildBackground(
+        child: showResult ? buildResult() : buildGame(),
       ),
     );
   }
 
+  // ───── GAME ─────
   Widget buildGame() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+    return SafeArea(
+      child: Column(
+        children: [
 
-        Container(
-          margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Column(
-            children: [
+          // HEADER
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade200,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  currentWord,
-                  style: const TextStyle(
-                    fontSize: 34,
+                const Text(
+                  "اختبار الحروف",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 15),
-
-              const Text(
-                "تبدأ بحرف ...... ؟",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.amber),
+                    const SizedBox(width: 5),
+                    Text("$score",
+                        style: const TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: 20),
+          // PROGRESS
+          Row(
+            children: List.generate(questions.length, (i) {
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: i <= index ? Colors.white : Colors.white38,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }),
+          ),
 
-        Column(
-          children: options.map((letter) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: SizedBox(
-                width: 250,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: () => checkAnswer(letter),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: getButtonColor(letter),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+          const SizedBox(height: 25),
+
+          // CARD
+          Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Column(
+              children: [
+                Text(word, style: const TextStyle(fontSize: 40)),
+                const SizedBox(height: 10),
+                const Text("يبدأ بأي حرف؟"),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // OPTIONS
+          Column(
+            children: options.map((e) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: SizedBox(
+                  width: 260,
+                  height: 55,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color(e),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () => check(e),
+                    child: Text(
+                      e,
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ),
-                  child: Text(
-                    letter,
-                    style: const TextStyle(fontSize: 30),
-                  ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
+  // ───── RESULT ─────
   Widget buildResult() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.emoji_events, color: Colors.amber, size: 120),
-        const SizedBox(height: 20),
+    int stars = (score / questions.length * 3).round();
 
-        const Text(
-          "أحسنت 🎉",
-          style: TextStyle(fontSize: 28, color: Colors.white),
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
 
-        const SizedBox(height: 10),
+          const Text("🏆", style: TextStyle(fontSize: 80)),
 
-        Text(
-          "درجتك: $score / ${questions.length}",
-          style: const TextStyle(fontSize: 24, color: Colors.white),
-        ),
+          const SizedBox(height: 10),
 
-        const SizedBox(height: 30),
+          const Text(
+            "أحسنت!",
+            style: TextStyle(fontSize: 28, color: Colors.white),
+          ),
 
-        ElevatedButton(
-          onPressed: restartGame,
-          child: const Text("🔄 إعادة اللعب"),
-        ),
-      ],
+          Text(
+            "درجتك: $score / ${questions.length}",
+            style: const TextStyle(color: Colors.white),
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              3,
+                  (i) => Icon(
+                Icons.star,
+                color: i < stars ? Colors.amber : Colors.white30,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          ElevatedButton(
+            onPressed: restart,
+            child: const Text("إعادة اللعب"),
+          ),
+        ],
+      ),
     );
   }
 }

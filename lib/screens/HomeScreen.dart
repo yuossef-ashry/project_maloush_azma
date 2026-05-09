@@ -10,48 +10,55 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
+
+        /// 🎨 الخلفية المتدرجة
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4FC3F7), Color(0xFF81C784)],
+            colors: [
+              Color(0xFF4FC3F7),
+              Color(0xFF81C784),
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
+
         child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // 👈 توسيط عمودي
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40), // 👈 مسافة أكبر فوق العنوان
 
+              /// 🏷️ العنوان
               const Text(
                 "تعليم الأطفال",
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 34,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
 
-              /// 👦 Mascot Image
+              /// 👦 الماسكوت داخل دائرة
               Container(
-                width: 180,
-                height: 180,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
+                width: 190,
+                height: 190,
+                decoration: BoxDecoration(
                   color: Colors.white,
+                  shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 20,
-                      color: Colors.black26,
-                      offset: Offset(0, 8),
+                      spreadRadius: 3,
+                      color: Colors.black.withOpacity(0.25),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: ClipOval(
                     child: Image.asset(
                       "assets/images/kid.png",
                       fit: BoxFit.cover,
@@ -60,16 +67,16 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
 
-              /// 🟠 Level 1 (كبرناها شوية)
+              /// 🟠 المستوى الأول
               buildLevelCard(
                 context,
                 title: "المستوى الأول",
                 subtitle: "الروضة",
+                stars: 5,
                 color: Colors.orange,
                 image: "assets/images/bear.png",
-                width: 340, // 👈 تكبير الزر
                 onTap: () {
                   Navigator.push(
                     context,
@@ -80,16 +87,16 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-              /// 🟣 Level 2 (كبرناها شوية)
+              /// 🟣 المستوى الثاني
               buildLevelCard(
                 context,
                 title: "المستوى الثاني",
                 subtitle: "المدرسة",
+                stars: 8,
                 color: Colors.purple,
                 image: "assets/images/bag.png",
-                width: 340, // 👈 تكبير الزر
                 onTap: () {
                   Navigator.push(
                     context,
@@ -99,8 +106,6 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-
-              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -109,66 +114,107 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildLevelCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required Color color,
-    required String image,
-    required double width, // 👈 جديد
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required String title,
+        required String subtitle,
+        required int stars,
+        required Color color,
+        required String image,
+        required VoidCallback onTap,
+      }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
+        width: 340,
         padding: const EdgeInsets.all(18),
+
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(30),
+
           boxShadow: const [
             BoxShadow(
-              blurRadius: 12,
+              blurRadius: 15,
               color: Colors.black26,
-              offset: Offset(0, 6),
+              offset: Offset(0, 8),
             ),
           ],
         ),
+
         child: Row(
           children: [
+
+            /// 🧸 صورة المستوى
             Container(
-              width: 65, // 👈 تكبير بسيط
-              height: 65,
+              width: 70,
+              height: 70,
+
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: ClipOval(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(image, fit: BoxFit.cover),
+
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Image.asset(
+                  image,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
 
             const SizedBox(width: 15),
 
+            /// 📝 النصوص والنجوم
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
+
+                  const SizedBox(height: 5),
+
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 16, color: Colors.white70),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// ⭐ النجوم
+                  Row(
+                    children: List.generate(
+                      stars,
+                          (index) => const Padding(
+                        padding: EdgeInsets.only(right: 2),
+                        child: Icon(
+                          Icons.star,
+                          color: Colors.yellow,
+                          size: 18,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            const Icon(Icons.arrow_forward_ios, color: Colors.white),
+            /// ➡️ السهم
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+            ),
           ],
         ),
       ),

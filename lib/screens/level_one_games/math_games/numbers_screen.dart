@@ -1,87 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class LettersGame extends StatefulWidget {
-  const LettersGame({super.key});
+class NumbersScreen extends StatefulWidget {
+  const NumbersScreen({super.key});
 
   @override
-  State<LettersGame> createState() => _LettersGameState();
+  State<NumbersScreen> createState() => _NumbersScreenState();
 }
 
-class _LettersGameState extends State<LettersGame> {
-  final List<Map<String, String>> letters = [
-    {"letter": "أ", "word": "أسد", "emoji": "🦁"},
-    {"letter": "ب", "word": "بطة", "emoji": "🦆"},
-    {"letter": "ت", "word": "تفاحة", "emoji": "🍎"},
-    {"letter": "ث", "word": "ثعلب", "emoji": "🦊"},
-    {"letter": "ج", "word": "جمل", "emoji": "🐫"},
-    {"letter": "ح", "word": "حصان", "emoji": "🐎"},
-    {"letter": "خ", "word": "خروف", "emoji": "🐑"},
-    {"letter": "د", "word": "دب", "emoji": "🐻"},
-    {"letter": "ذ", "word": "ذئب", "emoji": "🐺"},
-    {"letter": "ر", "word": "رمان", "emoji": "🍎"},
-    {"letter": "ز", "word": "زهرة", "emoji": "🌸"},
-    {"letter": "س", "word": "سمكة", "emoji": "🐟"},
-    {"letter": "ش", "word": "شمس", "emoji": "☀️"},
-    {"letter": "ص", "word": "صقر", "emoji": "🦅"},
-    {"letter": "ض", "word": "ضفدع", "emoji": "🐸"},
-    {"letter": "ط", "word": "طائرة", "emoji": "✈️"},
-    {"letter": "ظ", "word": "ظرف", "emoji": "✉️"},
-    {"letter": "ع", "word": "عصفور", "emoji": "🐦"},
-    {"letter": "غ", "word": "غزال", "emoji": "🦌"},
-    {"letter": "ف", "word": "فيل", "emoji": "🐘"},
-    {"letter": "ق", "word": "قطة", "emoji": "🐱"},
-    {"letter": "ك", "word": "كرة", "emoji": "⚽"},
-    {"letter": "ل", "word": "ليمون", "emoji": "🍋"},
-    {"letter": "م", "word": "موز", "emoji": "🍌"},
-    {"letter": "ن", "word": "نجمة", "emoji": "⭐"},
-    {"letter": "ه", "word": "هلال", "emoji": "🌙"},
-    {"letter": "و", "word": "وردة", "emoji": "🌹"},
-    {"letter": "ي", "word": "يد", "emoji": "✋"},
+class _NumbersScreenState extends State<NumbersScreen> {
+  final List<Map<String, String>> numbers = [
+    {"num": "1", "word": "واحد"},
+    {"num": "2", "word": "اثنين"},
+    {"num": "3", "word": "ثلاثة"},
+    {"num": "4", "word": "أربعة"},
+    {"num": "5", "word": "خمسة"},
+    {"num": "6", "word": "ستة"},
+    {"num": "7", "word": "سبعة"},
+    {"num": "8", "word": "ثمانية"},
+    {"num": "9", "word": "تسعة"},
+    {"num": "10", "word": "عشرة"},
   ];
 
   int index = 0;
   final AudioPlayer player = AudioPlayer();
 
-  String get currentLetter => letters[index]["letter"]!;
-  String get currentWord => letters[index]["word"]!;
-  String get currentEmoji => letters[index]["emoji"]!;
+  String get currentNumber => numbers[index]["num"]!;
+  String get currentWord => numbers[index]["word"]!;
 
-  void playSound() async {
-    await player.stop();
-    await player.play(AssetSource("sounds/$currentLetter.mp3"));
-  }
-
-  void nextLetter() {
-    if (index < letters.length - 1) {
-      setState(() => index++);
-      playSound();
-    }
-  }
-
-  void prevLetter() {
-    if (index > 0) {
-      setState(() => index--);
-      playSound();
-    }
-  }
-
-  // ───────── BACKGROUND ─────────
-  Widget buildBackground({required Widget child}) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF4FC3F7),
-            Color(0xFF81C784),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: child,
-    );
-  }
+  double get progress => (index + 1) / numbers.length;
 
   @override
   void initState() {
@@ -89,19 +36,55 @@ class _LettersGameState extends State<LettersGame> {
     playSound();
   }
 
+  /// 🔊 تشغيل الصوت
+  void playSound() async {
+    try {
+      await player.stop();
+      await player.play(AssetSource("sounds/$currentNumber.mp3"));
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+
+  void next() {
+    if (index < numbers.length - 1) {
+      setState(() => index++);
+      playSound();
+    }
+  }
+
+  void prev() {
+    if (index > 0) {
+      setState(() => index--);
+      playSound();
+    }
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double progress = (index + 1) / letters.length;
-
     return Scaffold(
-      body: buildBackground(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF4FC3F7), Color(0xFF81C784)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
 
-                /// 🔝 HEADER
+                /// 🔝 العنوان
                 Row(
                   children: [
                     IconButton(
@@ -110,7 +93,7 @@ class _LettersGameState extends State<LettersGame> {
                     ),
                     const Expanded(
                       child: Text(
-                        "تعلم الحروف",
+                        "تعلم الأرقام",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
@@ -125,7 +108,7 @@ class _LettersGameState extends State<LettersGame> {
 
                 const SizedBox(height: 20),
 
-                /// 📊 PROGRESS
+                /// 📊 Progress
                 Column(
                   children: [
                     Row(
@@ -136,9 +119,10 @@ class _LettersGameState extends State<LettersGame> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         Text(
-                          "${index + 1} / ${letters.length}",
+                          "${index + 1} / ${numbers.length}",
                           style: const TextStyle(
                             color: Colors.white,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -149,19 +133,18 @@ class _LettersGameState extends State<LettersGame> {
                       borderRadius: BorderRadius.circular(20),
                       child: LinearProgressIndicator(
                         value: progress,
-                        minHeight: 12,
+                        minHeight: 14,
                         backgroundColor: Colors.white30,
-                        valueColor: const AlwaysStoppedAnimation(
-                          Colors.orange,
-                        ),
+                        valueColor:
+                        const AlwaysStoppedAnimation(Colors.orange),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
 
-                /// 🧠 CARD
+                /// 🟡 الكارت
                 Expanded(
                   child: Container(
                     width: double.infinity,
@@ -174,64 +157,71 @@ class _LettersGameState extends State<LettersGame> {
                           color: Colors.black26,
                           blurRadius: 15,
                           offset: Offset(0, 8),
-                        ),
+                        )
                       ],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(currentEmoji,
-                            style: const TextStyle(fontSize: 60)),
-                        const SizedBox(height: 10),
+
+                        /// 🔢 الرقم الكبير
                         Text(
-                          currentLetter,
+                          currentNumber,
                           style: const TextStyle(
-                            fontSize: 90,
+                            fontSize: 120,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange,
+                            color: Colors.deepPurple,
                           ),
                         ),
-                        const SizedBox(height: 10),
+
+                        const SizedBox(height: 20),
+
+                        /// 📝 اسم الرقم بالعربي
                         Text(
                           currentWord,
                           style: const TextStyle(
-                            fontSize: 34,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 25),
 
+                        const SizedBox(height: 30),
+
+                        /// 🔊 زر الصوت
                         ElevatedButton.icon(
                           onPressed: playSound,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 12,
+                              horizontal: 30,
+                              vertical: 14,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
                           icon: const Icon(Icons.volume_up),
-                          label: const Text("تكرار الصوت"),
+                          label: const Text("تشغيل الصوت 🔊"),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
 
-                /// ⬅️➡️ BUTTONS
+                /// ⬅️➡️ الأزرار
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: prevLetter,
+                        onPressed: prev,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                         ),
                         icon: const Icon(Icons.arrow_back),
                         label: const Text("السابق"),
@@ -240,10 +230,13 @@ class _LettersGameState extends State<LettersGame> {
                     const SizedBox(width: 15),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: nextLetter,
+                        onPressed: next,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                         ),
                         icon: const Icon(Icons.arrow_forward),
                         label: const Text("التالي"),

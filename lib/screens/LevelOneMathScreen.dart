@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'level_one_games/level_one_games_2/numbers_screen.dart';
-import 'level_one_games/level_one_games_2/match_image_number_screen.dart';
-import 'level_one_games/level_one_games_2/choose_number_screen.dart';
-import 'level_one_games/level_one_games_2/numbers_quiz_screen.dart';
+import 'level_one_games/math_games/numbers_screen.dart';
+import 'level_one_games/math_games/match_image_number_screen.dart';
+import 'level_one_games/math_games/choose_number_screen.dart';
+import 'level_one_games/math_games/numbers_quiz_screen.dart';
 
 class LevelOneMathScreen extends StatelessWidget {
   const LevelOneMathScreen({super.key});

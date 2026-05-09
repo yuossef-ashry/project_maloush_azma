@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+// 📌 استيراد شاشات الألعاب (مرة واحدة فقط)
+import 'package:teaching_children/screens/level_two_games/math_games_2/times_table_screen.dart';
+import 'package:teaching_children/screens/level_two_games/math_games_2/addition_game_screen.dart';
+import 'package:teaching_children/screens/level_two_games/math_games_2/subtraction_game_screen.dart';
+import 'package:teaching_children/screens/level_two_games/math_games_2/multiplication_game_screen.dart';
+import 'package:teaching_children/screens/level_two_games/math_games_2/division_game_screen.dart';
+
 class LevelTwoMathScreen extends StatelessWidget {
   LevelTwoMathScreen({super.key});
 
@@ -9,6 +16,14 @@ class LevelTwoMathScreen extends StatelessWidget {
     {"title": "الطرح", "image": "assets/images/17.jpeg"},
     {"title": "الضرب", "image": "assets/images/15.jpeg"},
     {"title": "القسمة", "image": "assets/images/16.jpeg"},
+  ];
+
+  final List<Widget> screens = [
+    TimesTableScreen(),
+    AdditionGameScreen(),
+    SubtractionGameScreen(),
+    MultiplicationGameScreen(),
+    DivisionGameScreen(),
   ];
 
   @override
@@ -25,12 +40,12 @@ class LevelTwoMathScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-
               const SizedBox(height: 25),
 
-              /// 📦 عنوان داخل بوكس
+              /// 🟦 TITLE
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
@@ -54,19 +69,21 @@ class LevelTwoMathScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
+              /// 🧩 GRID
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: GridView.builder(
                     itemCount: items.length,
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    gridDelegate:
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 200,
                       childAspectRatio: 7 / 8,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                     ),
                     itemBuilder: (context, index) {
-                      return buildCard(context, items[index]);
+                      return buildCard(context, index);
                     },
                   ),
                 ),
@@ -78,9 +95,14 @@ class LevelTwoMathScreen extends StatelessWidget {
     );
   }
 
-  Widget buildCard(BuildContext context, Map<String, String> item) {
+  Widget buildCard(BuildContext context, int index) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screens[index]),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -96,8 +118,6 @@ class LevelTwoMathScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
-            /// 🖼️ صورة
             Container(
               width: 85,
               height: 85,
@@ -107,17 +127,14 @@ class LevelTwoMathScreen extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Image.asset(item["image"]!),
+                child: Image.asset(items[index]["image"]!),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            /// 📝 عنوان
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
-                item["title"]!,
+                items[index]["title"]!,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 16,
